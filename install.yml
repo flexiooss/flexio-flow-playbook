@@ -1,0 +1,55 @@
+---
+
+- name: Install flexio-flow
+  hosts:
+    localhost
+  connection: local
+
+  vars:
+    repo_url: 'https://github.com/flexiooss/flexio-flow.git'
+    repo_version: master
+    install_dir: "{{ ansible_env.HOME }}/.flexio-flow/src"
+    cmd_invoke: flexio-flow
+
+  tasks:
+    - name: Install latest version of "git"
+      become: yes
+      apt:
+        name: git
+        state: latest
+
+    - name: Install "python 3.7"
+      become: yes
+      apt:
+        name: python3.7
+        state: present
+
+    - name: Install "python 3.7 venv"
+      become: yes
+      apt:
+        name: python3.7-venv
+        state: present
+
+    - name: Ensure have last flexio-flow "{{repo_version}}" version in "{{install_dir}}"
+      git:
+        repo: "{{repo_url}}"
+        dest: "{{install_dir}}"
+        version: "{{repo_version}}"
+
+    - name: Activate venv for python3.7
+      command: bash "{{install_dir}}"/venv.sh
+
+    - name: Ensure have hbshed into /usr/local/bin/
+      become: yes
+      template:
+        src: ./bin/flexio-flow.j2
+        dest: "/usr/local/bin/{{cmd_invoke}}"
+        mode: 751
+
+    - name: Ensure flexio-flow is installed
+      shell: flexio-flow -h
+      register: self_install
+
+    - debug: msg="{{ self_install.stdout }}"
+    - debug: msg="{{ self_install.stderr }}"
+
