@@ -18,16 +18,16 @@
         name: git
         state: latest
 
-    - name: Install "python 3.7"
+    - name: Install "python 3"
       become: yes
       apt:
-        name: python3.7
+        name: python3
         state: present
 
-    - name: Install "python 3.7 venv"
+    - name: Install "python 3 venv"
       become: yes
       apt:
-        name: python3.7-venv
+        name: python3-venv
         state: present
 
     - name: Ensure have last flexio-flow "{{repo_version}}" version in "{{install_dir}}"
